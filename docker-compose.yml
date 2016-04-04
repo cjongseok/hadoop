@@ -1,0 +1,29 @@
+    hdfs_nn:
+        container_name: hdfs-namenode
+        image: hadoop:2.5.2
+        restart: always
+        expose: 
+            - "9000"
+            - "50070"
+            - "50090"
+        ports:
+            - "9000:9000"
+            - "50070:50070"
+            - "50090:50090"
+        command: --config /opt/hadoop-2.5.2/conf namenode --format
+
+    hdfs_dn:          
+        container_name: hdfs-datanode
+        image: hadoop:2.5.2
+        restart: always
+        expose:
+            - "50010"
+            - "50020"
+            - "50075"
+        ports:
+            - "50010:50010"
+            - "50020:50020"
+            - "50075:50075"
+        command: --config /opt/hadoop-2.5.2/conf datanode
+
+
