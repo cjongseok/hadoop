@@ -7,7 +7,7 @@ SCRIPT_DIR=$(dirname $(readlink -e $0))
 #/etc/init.d/ssh start
 #nohup /usr/sbin/sshd -D > /var/log/sshd.log 2>&1
 
-SRV_HDFS_NAMENODE="hdfs-nn"
+SRV_HDFS_NAMENODE="hdfs_nn"
 HADOOP_CONF_CORE=$HADOOP_CONF_DIR/core-site.xml
 
 HDFS=${HADOOP_HOME}/bin/hdfs
