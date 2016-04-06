@@ -19,6 +19,6 @@
 <configuration>
 	<property>
 		<name>fs.defaultFS</name>
-		<value>hdfs://hdfs-namenode:9000</value>
+		<value>hdfs://HDFS_NAMENODE:9000</value>
 	</property>
 </configuration>

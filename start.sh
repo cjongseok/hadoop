@@ -3,6 +3,8 @@ TRUE="true"
 FALSE="false"
 SCRIPT_DIR=$(dirname $(readlink -e $0))
 
+echo "DOCKER_BRIDGE_IP=$DOCKER_BRIDGE_IP"
+
 #service sshd start
 #/etc/init.d/ssh start
 #nohup /usr/sbin/sshd -D > /var/log/sshd.log 2>&1
@@ -17,7 +19,7 @@ ACTION_DATANODE="datanode"
 OPTION_CONFIG="--config"
 NAMENODE_OPTION_FORMAT="--format"
 
-SRV_RESOLVER=srv_resolver.sh
+SRV_RESOLVER=/opt/srv_resolver.sh
 
 APP_HOME=$SCRIPT_DIR
 PID_DIR=$APP_HOME/logs/pid
@@ -53,10 +55,22 @@ function func_check_hdfs_formatted(){
 }
 
 function func_configure_hdfs(){
-    local hdfs_nn_ip=$($SRV_RESOLVER -i $SRV_HDFS_NAMENODE)
-    if [ ! -z $hdfs_nn_ip ]; then
-        sed -i 's/HDFS_NAMENODE/'"$hdfs_nn_ip"'/g' $HADOOP_CONF_CORE
-    fi
+    local unset hdfs_nn_ip
+    while true; do
+        hdfs_nn_ip=$($SRV_RESOLVER -i $SRV_HDFS_NAMENODE | awk '{print $1}')
+#        hdfs_nn_ip=192.168.1.188
+        if [ ! -z $hdfs_nn_ip ]; then
+            echo "$SRV_HDFS_NAMENODE is resolved as $hdfs_nn_ip"
+            if [ ! -z $hdfs_nn_ip ]; then
+                sed -i 's/HDFS_NAMENODE/'"$hdfs_nn_ip"'/g' $HADOOP_CONF_CORE
+            fi
+            break
+        else
+            echo "CANNOT resolve service, $SRV_HDFS_NAMENODE"
+            sleep 1
+        fi
+
+    done
 }
 
 function func_parse_args(){
@@ -107,6 +121,7 @@ function func_init_log(){
 }
 
 function action_run_namenode(){
+    sed -i 's/HDFS_NAMENODE/localhost/g' $HADOOP_CONF_CORE
     local unset cmd
     local is_formatted=$(func_check_hdfs_formatted)
     if [ $namenode_format ] && [[ $is_formatted == $FALSE ]]; then

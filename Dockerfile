@@ -7,7 +7,8 @@ ENV HADOOP_VERSION=2.5.2
 RUN set -ex \
         && apt-get update \
         && apt-get -y install wget curl build-essential \
-        && apt-get -y install alien dpkg-dev debhelper
+        && apt-get -y install alien dpkg-dev debhelper \
+        && apt-get -y install dnsutils
 
 # install oracle jdk 8
 #RUN set -ex \
@@ -73,6 +74,7 @@ RUN set -ex \
 # run ssh at start-up        
 
 COPY start.sh /opt/start.sh
+COPY srv_resolver.sh /opt/srv_resolver.sh
 
 EXPOSE 22
         
