@@ -1,4 +1,6 @@
 #!/bin/bash
+TRUE="true"
+FALSE="false"
 SCRIPT_DIR=$(dirname $(readlink -e $0))
 
 #service sshd start
@@ -39,6 +41,15 @@ function func_usage(){
     echo " $OPTION_CONFIG confdir"
 #    echo " $ACTION_STOP"
     exit
+}
+
+function func_check_hdfs_formatted(){
+    local ls_tmp=$(ls /tmp | grep hadoop | awk '{print $1}')
+    if [ -z $ls_tmp ]; then
+        echo $FALSE
+    else
+        echo $TRUE
+    fi
 }
 
 function func_configure_hdfs(){
@@ -97,7 +108,8 @@ function func_init_log(){
 
 function action_run_namenode(){
     local unset cmd
-    if [ $namenode_format ]; then
+    local is_formatted=$(func_check_hdfs_formatted)
+    if [ $namenode_format ] && [[ $is_formatted == $FALSE ]]; then
         cmd="$HDFS namenode -format && "
     fi
 
@@ -106,6 +118,7 @@ function action_run_namenode(){
     else
         cmd="$cmd $HDFS $OPTION_CONFIG $conf_dir namenode"
     fi
+    echo "run $cmd"
     eval $cmd
 }
 
