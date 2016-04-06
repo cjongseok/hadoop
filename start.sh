@@ -5,12 +5,17 @@ SCRIPT_DIR=$(dirname $(readlink -e $0))
 #/etc/init.d/ssh start
 #nohup /usr/sbin/sshd -D > /var/log/sshd.log 2>&1
 
+SRV_HDFS_NAMENODE="hdfs-nn"
+HADOOP_CONF_CORE=$HADOOP_CONF_DIR/core-site.xml
+
 HDFS=${HADOOP_HOME}/bin/hdfs
 ACTION_NAMENODE="namenode"
 ACTION_DATANODE="datanode"
 #ACTION_STOP="stop"
 OPTION_CONFIG="--config"
 NAMENODE_OPTION_FORMAT="--format"
+
+SRV_RESOLVER=srv_resolver.sh
 
 APP_HOME=$SCRIPT_DIR
 PID_DIR=$APP_HOME/logs/pid
@@ -34,6 +39,13 @@ function func_usage(){
     echo " $OPTION_CONFIG confdir"
 #    echo " $ACTION_STOP"
     exit
+}
+
+function func_configure_hdfs(){
+    local hdfs_nn_ip=$($SRV_RESOLVER -i $SRV_HDFS_NAMENODE)
+    if [ ! -z $hdfs_nn_ip ]; then
+        sed -i 's/HDFS_NAMENODE/'"$hdfs_nn_ip"'/g' $HADOOP_CONF_CORE
+    fi
 }
 
 function func_parse_args(){
@@ -98,6 +110,7 @@ function action_run_namenode(){
 }
 
 function action_run_datanode(){
+    func_configure_hdfs
      if [ -z $conf_dir ]; then
         eval $HDFS datanode
     else
@@ -123,8 +136,6 @@ function func_run_action(){
 argv=($@)
 echo $@
 func_parse_args ${argv[@]}
-url=$(func_resolve_service namenode)
-func_set_namenode_url $url
 #func_check_process
 func_init_log
 func_run_action
