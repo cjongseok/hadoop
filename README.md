@@ -1,1 +1,1 @@
-# hadoop 2.5.2
+# hadoop 2.4.1

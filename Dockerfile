@@ -75,6 +75,7 @@ RUN set -ex \
 # run ssh at start-up        
 
 COPY start.sh /opt/start.sh
+COPY tools.sh /opt/tools.sh
 COPY srv_resolver.sh /opt/srv_resolver.sh
 
 EXPOSE 22
