@@ -19,6 +19,10 @@
 <configuration>
 	<property>
 		<name>fs.defaultFS</name>
-		<value>hdfs://HDFS_NAMENODE:9000</value>
-	</property>
+        <value>hdfs://<NAMENODE_SERVICE_NAME>:9000</value>
+    </property>
+    <property>
+        <name>hadoop.tmp.dir</name>
+        <value>/opt/hdfs_data
+    </property>
 </configuration>

@@ -1,7 +1,7 @@
 from ubuntu:14.04
 
 ENV ORACLE_JDK_VERSION=1.8.0_77
-ENV HADOOP_VERSION=2.5.2
+ENV HADOOP_VERSION=2.4.1
 
 # install dependencies
 RUN set -ex \
@@ -40,13 +40,14 @@ RUN echo "export JAVA_HOME=${JAVA_HOME}" >> /etc/profile \
 
 WORKDIR ${HADOOP_PREFIX}
 
-# install hadoop 2.5.2 binary
+# install hadoop binary
 ENV HADOOP_CONF_DIR="${HADOOP_PREFIX}/conf"
 ENV HADOOP_NAMENODE_OPTS="-XX:+UseParallelGC ${HADOOP_NAMENODE_OPTS}"
 ENV HADOOP_LOG_DIR=${HADOOP_HOME}/logs
 RUN set -ex \
         && cd /opt \
-        && wget http://apache.mirror.cdnetworks.com/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \
+        && wget https://archive.apache.org/dist/hadoop/core/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \
+#        && wget http://apache.mirror.cdnetworks.com/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \
         && tar xvzf hadoop-${HADOOP_VERSION}.tar.gz \
         && sed -i '1iexport HADOOP_NAMENODE_OPTS='"${HADOOP_NAMENODE_OPTS}"'' ${HADOOP_PREFIX}/libexec/hadoop-config.sh \
         && sed -i '1iJAVA_HOME='"${JAVA_HOME}"'' ${HADOOP_PREFIX}/libexec/hadoop-config.sh \

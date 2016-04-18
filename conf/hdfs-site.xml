@@ -20,5 +20,9 @@
 	<property>
 		<name>dfs.replication</name>
 		<value>3</value>
-	</property>
+    </property>
+    <property>
+        <name>dfs.secondary.http.address</name>
+        <value><SECONDARY_NAMENODE_SERVICE_NAME>:50090</value>
+    </property>
 </configuration>

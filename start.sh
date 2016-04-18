@@ -121,7 +121,7 @@ function func_init_log(){
 }
 
 function action_run_namenode(){
-    sed -i 's/HDFS_NAMENODE/localhost/g' $HADOOP_CONF_CORE
+#    sed -i 's/HDFS_NAMENODE/localhost/g' $HADOOP_CONF_CORE
     local unset cmd
     local is_formatted=$(func_check_hdfs_formatted)
     if [ $namenode_format ] && [[ $is_formatted == $FALSE ]]; then
@@ -137,8 +137,16 @@ function action_run_namenode(){
     eval $cmd
 }
 
+function action_run_secondary_namenode(){
+    if [ -z $conf_dir ]; then
+        eval $HDFS secondarynamenode
+    else
+        eval $HDFS $OPTION_CONFIG $conf_dir secondarynamenode
+    fi
+}
+
 function action_run_datanode(){
-    func_configure_hdfs
+#    func_configure_hdfs
      if [ -z $conf_dir ]; then
         eval $HDFS datanode
     else
@@ -151,6 +159,9 @@ function func_run_action(){
     case "$action" in
         namenode)
             action_run_namenode
+            ;;
+        secondarynamenode)
+            action_run_secondary_namenode
             ;;
         datanode)
             action_run_datanode
