@@ -1,6 +1,6 @@
 hdfs_dn:          
     container_name: hdfs_dn
-    image: hadoop:2.4.1
+    image: cjongseok/hadoop:2.4.1
     restart: always
     expose:
         - "50010"

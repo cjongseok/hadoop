@@ -1,6 +1,6 @@
 hdfs_nn_2:
     container_name: hdfs_nn_2
-    image: hadoop:2.4.1
+    image: cjongseok/hadoop:2.4.1
     restart: always
     expose: 
         - "9000"
