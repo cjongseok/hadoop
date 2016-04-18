@@ -1,0 +1,24 @@
+hdfs_dn:          
+    container_name: hdfs_dn
+    image: hadoop:2.4.1
+    restart: always
+    expose:
+        - "50010"
+        - "50020"
+        - "50075"
+    ports:
+        - "50010:50010"
+        - "50020:50020"
+        - "50075:50075"
+    volumes:
+        # HDFS_DATA_VOLUME_HOST is automatically resolved by hdfs_env.sh
+        - <HDFS_DATA_VOLUME_HOST>:/opt/hdfs_data
+    environment:
+        # Below env variables are automatically allocated by hdfs_env.sh
+        #- DOCKER_BRIDGE_IP=172.17.0.1
+        - SERVICE_NAME=
+        - NAMENODE_SERVICE_NAME=
+        - SECONDARY_NAMENODE_SERVICE_NAME=
+    command: --config /opt/hadoop-2.4.1/conf datanode
+
+
