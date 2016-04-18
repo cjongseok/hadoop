@@ -3,6 +3,8 @@ TRUE="true"
 FALSE="false"
 SCRIPT_DIR=$(dirname $(readlink -e $0))
 
+. ${SCRIPT_DIR}/tools.sh
+
 echo "DOCKER_BRIDGE_IP=$DOCKER_BRIDGE_IP"
 
 #service sshd start
@@ -11,6 +13,7 @@ echo "DOCKER_BRIDGE_IP=$DOCKER_BRIDGE_IP"
 
 SRV_HDFS_NAMENODE="hdfs_nn"
 HADOOP_CONF_CORE=$HADOOP_CONF_DIR/core-site.xml
+HADOOP_CONF_HDFS=$HADOOP_CONF_DIR/hdfs-sit.xml
 
 HDFS=${HADOOP_HOME}/bin/hdfs
 ACTION_NAMENODE="namenode"
@@ -71,6 +74,11 @@ function func_configure_hdfs(){
         fi
 
     done
+}
+
+function func_configure(){
+    tool_template_fill_in_in_place $HDFS_CONF_CORE "NAMENODE_SERVICE_NAME" $NAMENODE_SERVICE_NAME
+    tool_template_fill_in_in_place $HDFS_CONF_HDFS "SECONDARY_NAMENODE_SERVICE_NAME" $SECONDARY_NAMENODE_SERVICE_NAME
 }
 
 function func_parse_args(){
@@ -158,12 +166,15 @@ function action_run_datanode(){
 function func_run_action(){
     case "$action" in
         namenode)
+            func_configure
             action_run_namenode
             ;;
         secondarynamenode)
+            func_configure
             action_run_secondary_namenode
             ;;
         datanode)
+            func_configure
             action_run_datanode
             ;;
         *)
