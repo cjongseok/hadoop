@@ -13,7 +13,7 @@ echo "DOCKER_BRIDGE_IP=$DOCKER_BRIDGE_IP"
 
 SRV_HDFS_NAMENODE="hdfs_nn"
 HADOOP_CONF_CORE=$HADOOP_CONF_DIR/core-site.xml
-HADOOP_CONF_HDFS=$HADOOP_CONF_DIR/hdfs-sit.xml
+HADOOP_CONF_HDFS=$HADOOP_CONF_DIR/hdfs-site.xml
 
 HDFS=${HADOOP_HOME}/bin/hdfs
 ACTION_NAMENODE="namenode"
@@ -77,8 +77,8 @@ function func_configure_hdfs(){
 }
 
 function func_configure(){
-    tool_template_fill_in_in_place $HDFS_CONF_CORE "NAMENODE_SERVICE_NAME" $NAMENODE_SERVICE_NAME
-    tool_template_fill_in_in_place $HDFS_CONF_HDFS "SECONDARY_NAMENODE_SERVICE_NAME" $SECONDARY_NAMENODE_SERVICE_NAME
+    tool_template_fill_in_in_place $HADOOP_CONF_CORE "NAMENODE_SERVICE_NAME" $NAMENODE_SERVICE_NAME
+    tool_template_fill_in_in_place $HADOOP_CONF_HDFS "SECONDARY_NAMENODE_SERVICE_NAME" $SECONDARY_NAMENODE_SERVICE_NAME
 }
 
 function func_parse_args(){
