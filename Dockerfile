@@ -78,7 +78,7 @@ COPY start /opt/start
 COPY tools.sh /opt/tools.sh
 COPY srv_resolver.sh /opt/srv_resolver.sh
 
-EXPOSE 22
+EXPOSE 22 9000 50070 50090 50010 50020 50075
         
 #CMD ["/opt/start"]        
 #CMD ["/usr/sbin/sshd", "-D"]
