@@ -2,10 +2,6 @@ hdfs_dn:
     container_name: hdfs_dn
     image: cjongseok/hadoop:2.4.1
     restart: always
-    expose:
-        - "50010"
-        - "50020"
-        - "50075"
     ports:
         - "50010:50010"
         - "50020:50020"
