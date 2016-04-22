@@ -74,12 +74,13 @@ RUN set -ex \
 #        && service ssh start
 # run ssh at start-up        
 
-COPY start.sh /opt/start.sh
+COPY start /opt/start
 COPY tools.sh /opt/tools.sh
 COPY srv_resolver.sh /opt/srv_resolver.sh
 
 EXPOSE 22
         
-#CMD ["/opt/start.sh"]        
+#CMD ["/opt/start"]        
 #CMD ["/usr/sbin/sshd", "-D"]
-ENTRYPOINT ["/opt/start.sh"]
+ENTRYPOINT ["/opt/start"]
+#ENTRYPOINT ["/bin/bash"]

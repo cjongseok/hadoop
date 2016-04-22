@@ -1,5 +1,5 @@
 hdfs_nn_2:
-    container_name: hdfs_nn_2
+    container_name: hdfs_nn2
     image: cjongseok/hadoop:2.4.1
     restart: always
     expose: 
@@ -20,4 +20,4 @@ hdfs_nn_2:
         - NAMENODE_SERVICE_NAME=
         - SECONDARY_NAMENODE_SERVICE_NAME=
     #command: --config /opt/hadoop-2.4.1/conf namenode --format
-    command: --config /opt/hadoop-2.4.1/conf namenode
+    command: --config /opt/hadoop-2.4.1/conf secondarynamenode

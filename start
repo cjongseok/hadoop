@@ -1,11 +1,12 @@
 #!/bin/bash
 TRUE="true"
 FALSE="false"
-SCRIPT_DIR=$(dirname $(readlink -e $0))
+SCRIPT_NAME=$0
+SCRIPT_DIR=$(dirname $(readlink -e $SCRIPT_NAME))
 
 . ${SCRIPT_DIR}/tools.sh
 
-echo "DOCKER_BRIDGE_IP=$DOCKER_BRIDGE_IP"
+#echo "DOCKER_BRIDGE_IP=$DOCKER_BRIDGE_IP"
 
 #service sshd start
 #/etc/init.d/ssh start
@@ -14,10 +15,14 @@ echo "DOCKER_BRIDGE_IP=$DOCKER_BRIDGE_IP"
 SRV_HDFS_NAMENODE="hdfs_nn"
 HADOOP_CONF_CORE=$HADOOP_CONF_DIR/core-site.xml
 HADOOP_CONF_HDFS=$HADOOP_CONF_DIR/hdfs-site.xml
+HADOOP_TMP_DIR=/opt/hdfs_data
+HDFS_NAMENODE_VOLUME=$HADOOP_TMP_DIR/dfs/name
 
 HDFS=${HADOOP_HOME}/bin/hdfs
 ACTION_NAMENODE="namenode"
+ACTION_SECONDARY_NAMENODE="secondarynamenode"
 ACTION_DATANODE="datanode"
+OPTION_DEBUG="--debug"
 #ACTION_STOP="stop"
 OPTION_CONFIG="--config"
 NAMENODE_OPTION_FORMAT="--format"
@@ -29,6 +34,7 @@ PID_DIR=$APP_HOME/logs/pid
 PID_FILE=hdfs.pid
 
 unset action
+debug=$FALSE
 unset conf_dir
 unset namenode_format
 #LOGS_DIR
@@ -36,47 +42,50 @@ unset namenode_format
 
 function func_usage(){
     #echo "${BASH_ARGV[${#BASH_ARGV[@]}-1]} [OPTION] <ACTION>"
-    echo "start.sh [OPTION] <ACTION>"
+    echo "$SCRIPT_NAME [OPTION] <ACTION>"
     echo ""
     echo "ACTION"
+    echo ""
     echo " $ACTION_NAMENODE [$NAMENODE_OPTION_FORMAT]"
+    echo " $ACTION_SECONDARY_NAMENODE"
     echo " $ACTION_DATANODE"
     echo ""
     echo "OPTION"
+    echo " $OPTION_DEBUG"
     echo " $OPTION_CONFIG confdir"
 #    echo " $ACTION_STOP"
-    exit
+#    exit
 }
 
 function func_check_hdfs_formatted(){
-    local ls_tmp=$(ls /tmp | grep hadoop | awk '{print $1}')
-    if [ -z $ls_tmp ]; then
-        echo $FALSE
-    else
+    if [ -d $HDFS_NAMENODE_VOLUME ]; then
         echo $TRUE
+    else
+        echo $FALSE
     fi
 }
 
-function func_configure_hdfs(){
-    local unset hdfs_nn_ip
-    while true; do
-        hdfs_nn_ip=$($SRV_RESOLVER -i $SRV_HDFS_NAMENODE | awk '{print $1}')
-#        hdfs_nn_ip=192.168.1.188
-        if [ ! -z $hdfs_nn_ip ]; then
-            echo "$SRV_HDFS_NAMENODE is resolved as $hdfs_nn_ip"
-            if [ ! -z $hdfs_nn_ip ]; then
-                sed -i 's/HDFS_NAMENODE/'"$hdfs_nn_ip"'/g' $HADOOP_CONF_CORE
-            fi
-            break
-        else
-            echo "CANNOT resolve service, $SRV_HDFS_NAMENODE"
-            sleep 1
-        fi
-
-    done
-}
+#function func_configure_hdfs(){
+#    local unset hdfs_nn_ip
+#    while true; do
+#        hdfs_nn_ip=$($SRV_RESOLVER -i $SRV_HDFS_NAMENODE | awk '{print $1}')
+#        if [ ! -z $hdfs_nn_ip ]; then
+#            echo "$SRV_HDFS_NAMENODE is resolved as $hdfs_nn_ip"
+#            if [ ! -z $hdfs_nn_ip ]; then
+#                sed -i 's/HDFS_NAMENODE/'"$hdfs_nn_ip"'/g' $HADOOP_CONF_CORE
+#            fi
+#            break
+#        else
+#            echo "CANNOT resolve service, $SRV_HDFS_NAMENODE"
+#            sleep 1
+#        fi
+#
+#    done
+#}
 
 function func_configure(){
+#    echo "HADOOP_CONF_CORE=$HADOOP_CONF_CORE"
+#    echo "HADOOP_CONF_HDFS=$HADOOP_CONF_HDFS"
     tool_template_fill_in_in_place $HADOOP_CONF_CORE "NAMENODE_SERVICE_NAME" $NAMENODE_SERVICE_NAME
     tool_template_fill_in_in_place $HADOOP_CONF_HDFS "SECONDARY_NAMENODE_SERVICE_NAME" $SECONDARY_NAMENODE_SERVICE_NAME
 }
@@ -99,10 +108,18 @@ function func_parse_args(){
            action=$ACTION_NAMENODE
            ((argp++))
            break
+       elif [ $remained_args -eq 1 ] && [[ ${argv[argp]} == $ACTION_SECONDARY_NAMENODE ]]; then
+           action=$ACTION_SECONDARY_NAMENODE
+           ((argp++))
+           break
        elif [ $remained_args -eq 1 ] && [[ ${argv[argp]} == $ACTION_DATANODE ]]; then
            action=$ACTION_DATANODE
            ((argp++))
            break
+       elif [[ ${argv[argp]} == $OPTION_DEBUG ]]; then
+           debug=$TRUE
+           ((argp++))
+           continue
        elif [[ ${argv[argp]} == $OPTION_CONFIG ]]; then
            conf_dir=${argv[argp+1]}
            ((argp=argp+2))
@@ -128,9 +145,16 @@ function func_init_log(){
     fi
 }
 
+function func_debug(){
+    while true; do
+        echo "debug it!"
+        sleep 1
+    done
+}
+
 function action_run_namenode(){
 #    sed -i 's/HDFS_NAMENODE/localhost/g' $HADOOP_CONF_CORE
-    local unset cmd
+    local cmd=""
     local is_formatted=$(func_check_hdfs_formatted)
     if [ $namenode_format ] && [[ $is_formatted == $FALSE ]]; then
         cmd="$HDFS namenode -format && "
@@ -141,24 +165,53 @@ function action_run_namenode(){
     else
         cmd="$cmd $HDFS $OPTION_CONFIG $conf_dir namenode"
     fi
-    echo "run $cmd"
-    eval $cmd
+
+    if [[ $debug == $TRUE ]]; then
+        echo "here!!"
+        eval $cmd &
+        func_debug
+    else
+        echo "there!!"
+        eval $cmd
+    fi
 }
 
 function action_run_secondary_namenode(){
+    local unset cmd
+
     if [ -z $conf_dir ]; then
-        eval $HDFS secondarynamenode
+        cmd="$HDFS secondarynamenode"
+#        eval $HDFS secondarynamenode
     else
-        eval $HDFS $OPTION_CONFIG $conf_dir secondarynamenode
+        cmd="$HDFS $OPTION_CONFIG $conf_dir secondarynamenode"
+#       eval $HDFS $OPTION_CONFIG $conf_dir secondarynamenode
+    fi
+
+    if [[ $debug == $TRUE ]]; then
+        eval $cmd &
+        func_debug
+    else
+        eval $cmd
     fi
 }
 
 function action_run_datanode(){
 #    func_configure_hdfs
-     if [ -z $conf_dir ]; then
-        eval $HDFS datanode
+    local unset cmd
+
+    if [ -z $conf_dir ]; then
+        cmd="$HDFS datanode"
+#        eval $HDFS datanode
     else
-        eval $HDFS $OPTION_CONFIG $conf_dir datanode
+        cmd="$HDFS $OPTION_CONFIG $conf_dir datanode"
+#        eval $HDFS $OPTION_CONFIG $conf_dir datanode
+    fi
+
+    if [[ $debug == $TRUE ]]; then
+        eval $cmd &
+        func_debug
+    else
+        eval $cmd
     fi
 }
 

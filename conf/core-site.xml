@@ -23,6 +23,6 @@
     </property>
     <property>
         <name>hadoop.tmp.dir</name>
-        <value>/opt/hdfs_data
+        <value>/opt/hdfs_data</value>
     </property>
 </configuration>
