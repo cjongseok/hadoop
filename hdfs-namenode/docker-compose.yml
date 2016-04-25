@@ -2,6 +2,7 @@ hdfs_nn:
     container_name: hdfs_nn
     image: cjongseok/hadoop:2.4.1
     restart: always
+    hostname: <HOST_NAME>
     ports:
         - "9000:9000"
         - "50070:50070"
