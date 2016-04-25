@@ -16,5 +16,5 @@ hdfs_nn:
         - SERVICE_NAME=
         - NAMENODE_SERVICE_NAME=
         - SECONDARY_NAMENODE_SERVICE_NAME=
-    #command: --config /opt/hadoop-2.4.1/conf namenode --format
-    command: --debug --config /opt/hadoop-2.4.1/conf namenode --format
+    command: --config /opt/hadoop-2.4.1/conf namenode --format
+    #command: --debug --config /opt/hadoop-2.4.1/conf namenode --format

@@ -91,14 +91,14 @@ function func_resolve_service(){
 function func_configure(){
 #    echo "HADOOP_CONF_CORE=$HADOOP_CONF_CORE"
 #    echo "HADOOP_CONF_HDFS=$HADOOP_CONF_HDFS"
-    local nn_ip=$(func_resolve_service $NAMENODE_SERVICE_NAME)
-    local nn2_ip=$(func_resolve_service $SECONDARY_NAMENODE_SERVICE_NAME)
-    #tool_template_fill_in_in_place $HADOOP_CONF_CORE "NAMENODE_SERVICE_NAME" $NAMENODE_SERVICE_NAME
-    #tool_template_fill_in_in_place $HADOOP_CONF_HDFS "SECONDARY_NAMENODE_SERVICE_NAME" $SECONDARY_NAMENODE_SERVICE_NAME
-    echo "$NAMENODE_SERVICE_NAME=$nn_ip"
-    echo "$SECONDARY_NAMENODE_SERVICE_NAME=$nn2_ip"
-    tool_template_fill_in_in_place $HADOOP_CONF_CORE "NAMENODE_SERVICE_NAME" $nn_ip
-    tool_template_fill_in_in_place $HADOOP_CONF_HDFS "SECONDARY_NAMENODE_SERVICE_NAME" $nn2_ip
+    #local nn_ip=$(func_resolve_service $NAMENODE_SERVICE_NAME)
+    #local nn2_ip=$(func_resolve_service $SECONDARY_NAMENODE_SERVICE_NAME)
+    tool_template_fill_in_in_place $HADOOP_CONF_CORE "NAMENODE_SERVICE_NAME" $NAMENODE_SERVICE_NAME
+    tool_template_fill_in_in_place $HADOOP_CONF_HDFS "SECONDARY_NAMENODE_SERVICE_NAME" $SECONDARY_NAMENODE_SERVICE_NAME
+    #echo "$NAMENODE_SERVICE_NAME=$nn_ip"
+    #echo "$SECONDARY_NAMENODE_SERVICE_NAME=$nn2_ip"
+    #tool_template_fill_in_in_place $HADOOP_CONF_CORE "NAMENODE_SERVICE_NAME" $nn_ip
+    #tool_template_fill_in_in_place $HADOOP_CONF_HDFS "SECONDARY_NAMENODE_SERVICE_NAME" $nn2_ip
 }
 
 function func_parse_args(){
